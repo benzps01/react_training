@@ -1,19 +1,30 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 import BookCreate from './components/BookCreate';
 import BookList from './components/BookList';
 
 function App() {
   const [books, setBooks] = useState([]);
 
-  const createBook = (title) => {
-    const updatedBooks = [
-      ...books,
-      { id: Math.round(Math.random() * 9999), title },
-    ]; //since key and value have same name we can condense that
+  const fetchBooks = async () => {
+    const response = await axios.get('http://127.0.0.1:3001/books');
+
+    setBooks(response.data);
+  };
+
+  useEffect(() => {
+    fetchBooks();
+  }, []);
+
+  const createBook = async (title) => {
+    const response = await axios.post('http://127.0.0.1:3001/books', {
+      title,
+    });
+
+    const updatedBooks = [...books, response.data]; //since key and value have same name we can condense that
 
     setBooks(updatedBooks);
   };
-
   const deleteBookById = (id) => {
     const updatedBooks = books.filter((book) => {
       return book.id !== id;
@@ -41,5 +52,4 @@ function App() {
     </div>
   );
 }
-
 export default App;
